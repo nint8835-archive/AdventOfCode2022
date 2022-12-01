@@ -10,7 +10,7 @@ let maxNElves (elves: int[][]) (n: int) : int =
     elves
     |> Array.map Array.sum
     |> Array.sortDescending
-    |> (fun (array: int[]) -> array[..n - 1])
+    |> Array.take n
     |> Array.sum
 
 printfn $"Part A: {maxNElves inputData 1}"
