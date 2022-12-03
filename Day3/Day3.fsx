@@ -8,28 +8,26 @@ let getPriority (item: char) : int =
         .IndexOf item
     + 1
 
-let getCommonItems (bag: string * string) : char [] =
-    Set.intersect (Set.ofSeq (fst bag)) (Set.ofSeq (snd bag))
-    |> Set.toArray
 
-let partA (input: string []) : int =
+let calculatePriority (grouper: string [] -> string [] []) (input: string []) : int =
     input
-    |> Array.map (fun line -> (line[.. line.Length / 2 - 1], line[line.Length / 2 ..]))
-    |> Array.map getCommonItems
-    |> Array.map (fun common -> common |> Array.map getPriority |> Array.sum)
-    |> Array.sum
-
-let partB (input: string []) : int =
-    input
-    |> Array.chunkBySize 3
+    |> grouper
     |> Array.map (fun group ->
         group
-        |> Array.fold (fun acc bag -> Set.intersect acc (Set.ofSeq bag)) (Set.ofSeq group[0])
+        |> Array.map Set.ofSeq
+        |> Array.reduce Set.intersect
         |> Set.toArray
-        |> (fun arr -> arr[0]))
-    |> Array.map getPriority
+        |> Array.map getPriority
+        |> Array.sum)
     |> Array.sum
 
+let partAGroups (input: string []) : string [] [] =
+    input
+    |> Array.map (fun line ->
+        [| line[.. line.Length / 2 - 1]
+           line[line.Length / 2 ..] |])
 
-printfn $"%A{partA inputData}"
-printfn $"%A{partB inputData}"
+let partBGroups (input: string []) : string [] [] = input |> Array.chunkBySize 3
+
+printfn $"%A{inputData |> calculatePriority partAGroups}"
+printfn $"%A{inputData |> calculatePriority partBGroups}"
