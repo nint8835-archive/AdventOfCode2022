@@ -1,69 +1,28 @@
+/// Euclidean remainder, the proper modulo operation
+/// Taken from https://stackoverflow.com/a/35848799
+let inline (%!) a b = (a % b + b) % b
+
+let getCharCode (char: string) : int = ("ABCXYZ".IndexOf char) %! 3
+
+
 let inputData =
     (System.IO.File.ReadAllText "Day2/input.txt")
         .Split "\n"
-    |> Array.map (fun line -> line.Split " ")
+    |> Array.map (fun line -> line.Split " " |> Array.map getCharCode)
+    |> Array.map (fun line -> (line[0], line[1]))
 
-type WinStatus =
-    | Win
-    | Loss
-    | Draw
+let partA (m: int) (n: int) : int = (3 * ((1 + n - m) %! 3)) + n
 
-let winMap =
-    Map [ ("A",
-           Map [ ("X", Draw)
-                 ("Y", Win)
-                 ("Z", Loss) ])
-          ("B",
-           Map [ ("X", Loss)
-                 ("Y", Draw)
-                 ("Z", Win) ])
-          ("C",
-           Map [ ("X", Win)
-                 ("Y", Loss)
-                 ("Z", Draw) ]) ]
-
-let moveMap =
-    Map [ ("A",
-           Map [ ("X", "Z")
-                 ("Y", "X")
-                 ("Z", "Y") ])
-          ("B",
-           Map [ ("X", "X")
-                 ("Y", "Y")
-                 ("Z", "Z") ])
-          ("C",
-           Map [ ("X", "Y")
-                 ("Y", "Z")
-                 ("Z", "X") ]) ]
-
-
-let scoreMap =
-    Map [ ("X", 1); ("Y", 2); ("Z", 3) ]
-
-let winScoreMap =
-    Map [ (Win, 6); (Draw, 3); (Loss, 0) ]
-
-let useDirectly (_: string) (ourMove: string) : string = ourMove
-let desiredWinStatus (theirMove: string) (ourMove: string) : string = moveMap[theirMove][ourMove]
-
-let getScore (line: string []) (scoreGetter: string -> string -> string) : int =
-    let theirMove = line[0]
-    let ourMove = line[1]
-
-    let ourFinalMove =
-        scoreGetter theirMove ourMove
-
-    winScoreMap[winMap[theirMove][ourFinalMove]]
-    + scoreMap[ourFinalMove]
+let partB (m: int) (n: int) : int = (3 * (n - 1)) + ((m + n) %! 3) + 1
 
 let partAScore =
     inputData
-    |> Array.map (fun input -> getScore input useDirectly)
+    |> Array.map (fun line -> line ||> partA)
     |> Array.sum
 
 let partBScore =
     inputData
-    |> Array.map (fun input -> getScore input desiredWinStatus)
+    |> Array.map (fun line -> line ||> partB)
     |> Array.sum
 
 printfn $"Part A: {partAScore}"
