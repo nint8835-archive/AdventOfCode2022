@@ -7,6 +7,22 @@ type Instruction =
       from_col: int
       to_col: int }
 
+let applyMovement (reverse: bool) (grid: char [] []) (instruction: Instruction) : char [] [] =
+    let newGrid = Array.copy grid
+
+    let movedChars =
+        grid[instruction.from_col - 1][0 .. instruction.count - 1]
+
+    newGrid[instruction.from_col - 1] <- newGrid[instruction.from_col - 1][instruction.count ..]
+
+    newGrid[instruction.to_col - 1] <- Array.concat [| if reverse then
+                                                           movedChars |> Array.rev
+                                                       else
+                                                           movedChars
+                                                       newGrid[instruction.to_col - 1] |]
+
+    newGrid
+
 let gridLines = inputData[ 0 ].Split "\n"
 
 let stackCount =
@@ -23,8 +39,6 @@ let grid: char [] [] =
         |> Array.map (fun line -> line[4 * (columnNum - 1) + 1])
         |> Array.filter (fun entry -> entry <> ' '))
 
-printfn $"%A{grid}"
-
 let instructions =
     inputData[ 1 ].Split "\n"
     |> Array.map (fun instruction -> instruction.Split " ")
@@ -33,4 +47,25 @@ let instructions =
           from_col = int instruction[3]
           to_col = int instruction[5] })
 
-printfn $"%A{instructions}"
+let partAGrid =
+    instructions
+    |> Array.fold (applyMovement true) grid
+
+let partBGrid =
+    instructions
+    |> Array.fold (applyMovement false) grid
+
+let partAChars =
+    partAGrid
+    |> Array.map (fun col -> col[0])
+    |> Array.map string
+    |> String.concat ""
+
+let partBChars =
+    partBGrid
+    |> Array.map (fun col -> col[0])
+    |> Array.map string
+    |> String.concat ""
+
+printfn $"%A{partAChars}"
+printfn $"%A{partBChars}"
