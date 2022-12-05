@@ -8,20 +8,21 @@ type Instruction =
       to_col: int }
 
 let applyMovement (reverse: bool) (grid: char [] []) (instruction: Instruction) : char [] [] =
-    let newGrid = Array.copy grid
+    grid
+    |> Array.copy
+    |> Array.updateAt (instruction.from_col - 1) grid[instruction.from_col - 1].[instruction.count ..]
+    |> Array.updateAt
+        (instruction.to_col - 1)
+        (Array.concat [| grid[instruction.from_col - 1].[0 .. instruction.count - 1]
+                         |> (if reverse then Array.rev else id)
+                         grid[instruction.to_col - 1] |])
 
-    let movedChars =
-        grid[instruction.from_col - 1][0 .. instruction.count - 1]
-
-    newGrid[instruction.from_col - 1] <- newGrid[instruction.from_col - 1][instruction.count ..]
-
-    newGrid[instruction.to_col - 1] <- Array.concat [| if reverse then
-                                                           movedChars |> Array.rev
-                                                       else
-                                                           movedChars
-                                                       newGrid[instruction.to_col - 1] |]
-
-    newGrid
+let getTopString (reverse: bool) (instructions: Instruction []) (grid: char [] []) : string =
+    instructions
+    |> Array.fold (applyMovement reverse) grid
+    |> Array.map (fun col -> col[0])
+    |> Array.map string
+    |> String.concat ""
 
 let gridLines = inputData[ 0 ].Split "\n"
 
@@ -47,25 +48,11 @@ let instructions =
           from_col = int instruction[3]
           to_col = int instruction[5] })
 
-let partAGrid =
-    instructions
-    |> Array.fold (applyMovement true) grid
+let partAStr =
+    getTopString true instructions grid
 
-let partBGrid =
-    instructions
-    |> Array.fold (applyMovement false) grid
+let partBStr =
+    getTopString false instructions grid
 
-let partAChars =
-    partAGrid
-    |> Array.map (fun col -> col[0])
-    |> Array.map string
-    |> String.concat ""
-
-let partBChars =
-    partBGrid
-    |> Array.map (fun col -> col[0])
-    |> Array.map string
-    |> String.concat ""
-
-printfn $"%A{partAChars}"
-printfn $"%A{partBChars}"
+printfn $"{partAStr}"
+printfn $"{partBStr}"
