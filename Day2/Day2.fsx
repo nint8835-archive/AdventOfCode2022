@@ -2,7 +2,7 @@
 /// Taken from https://stackoverflow.com/a/35848799
 let inline (%!) a b = (a % b + b) % b
 
-let getCharCode (char: string) : int = ("ABCXYZ".IndexOf char) %! 3
+let getCharCode (char: string) : int = (("ABCXYZ".IndexOf char) %! 3) + 1
 
 
 let inputData =
