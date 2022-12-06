@@ -2,25 +2,15 @@ let inputData =
     (System.IO.File.ReadAllText "Day6/input.txt")
         .Split "\n"
 
-let partA (lines: string []) =
-    lines
+let findMarker (size: int) (input: string []) : int [] =
+    input
     |> Array.map (fun line ->
         line
         |> Array.ofSeq
-        |> Array.windowed 4
+        |> Array.windowed size
         |> Array.map (fun window -> (window |> Set.ofArray |> Set.count))
-        |> Array.findIndex (fun uniqueCount -> uniqueCount = 4)
-        |> (fun index -> index + 4))
+        |> Array.findIndex (fun uniqueCount -> uniqueCount = size)
+        |> (fun index -> index + size))
 
-let partB (lines: string []) =
-    lines
-    |> Array.map (fun line ->
-        line
-        |> Array.ofSeq
-        |> Array.windowed 14
-        |> Array.map (fun window -> (window |> Set.ofArray |> Set.count))
-        |> Array.findIndex (fun uniqueCount -> uniqueCount = 14)
-        |> (fun index -> index + 14))
-
-printfn $"%A{partA inputData}"
-printfn $"%A{partB inputData}"
+printfn $"%A{findMarker 4 inputData}"
+printfn $"%A{findMarker 14 inputData}"
